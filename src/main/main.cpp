@@ -11,7 +11,7 @@ int main(){
 	std::string img_list = "./image/list.txt";
 	std::ifstream list(img_list);
 	std::string  img_name;
-	RsaFaceDetector *detector = new RsaFaceDetector(5);
+	RsaFaceDetector *detector = new RsaFaceDetector(0);
 	while(list >> img_name){
 		std::cout << img_name << "\n";
 		cv::Mat img = cv::imread(img_name);
@@ -50,8 +50,8 @@ int main(){
 				output_name += *j;
 			}
 			cv::imwrite(output_name, img);
-			cv::imshow("test", img);
-			cv::waitKey(0);
+//			cv::imshow("test", img);
+//			cv::waitKey(0);
 		}
 		else{
 			std::cerr << "Bad image: " << img_name << "\n";

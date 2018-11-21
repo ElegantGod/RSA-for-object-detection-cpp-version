@@ -20,13 +20,13 @@ UTIL_SRC_DIR := $(SRC_DIR)/util
 INCLUDE_DIR := include
 LIB_DIR := lib
 
-CUDA_DIR := /usr/local/cuda-8.0
+CUDA_DIR := /usr/local/cuda-9.0
 CUDA_INCLUDE_DIR := $(CUDA_DIR)/include
 
 NVCC_FLAGS := -G 
 
 
-MAIN_CXX_SRCS := $(shell find $(MAIN_SRC_DIR) -name "*.cpp")
+MAIN_CXX_SRCS := $(shell find $(MAIN_SRC_DIR) -name "main.cpp")
 UTIL_CXX_SRCS := $(shell find $(UTIL_SRC_DIR) -name "*.cpp")
 UTIL_CU_SRCS := $(shell find src/util -name "*.cu")
 MAIN_CXX_OBJS := $(addprefix $(BUILD_DIR)/, ${MAIN_CXX_SRCS:.cpp=.o})
@@ -41,24 +41,25 @@ EXECUTABLE_PROGRAM := ${MAIN_CXX_OBJS:.o=.bin}
 ALL_BUILD_DIRS := $(sort $(BUILD_DIR) $(BUILD_DIR)/cuda/src/util $(addprefix $(BUILD_DIR)/, $(UTIL_SRC_DIR)) \
 	$(addprefix $(BUILD_DIR)/, $(MAIN_SRC_DIR)))
 
-CAFFE_DIR := $(THIRD_PARTY_DIR)/CaffeMex_v2
+CAFFE_DIR := $(THIRD_PARTY_DIR)/caffe
 CAFFE_INCLUDE_DIR := $(CAFFE_DIR)/include
 CAFFE_PB_DIR := $(CAFFE_DIR)/build/src
 CAFFE_LIB_DIR := $(CAFFE_DIR)/build/lib
 
 EIGEN_INCLUDE_DIR := /usr/include/eigen3
-OPENCV_INCLUDE_DIR := /usr/local/include
-OPENCV_LIB_DIR := /usr/local/lib
+OPENCV_INCLUDE_DIR := /home/infinova/anaconda2/include
+OPENCV_LIB_DIR := /home/infinova/anaconda2/lib
 
+ANACONDA_INCLUDE_DIR := /home/infinova/anaconda2/include
 GLOG_LIB_DIR := /usr/lib/x86_64-linux-gnu 
 
 CXX := /usr/bin/g++
 
 GDB_FLAG := -g 
 
-INCLUDE_DIRS := $(CAFFE_INCLUDE_DIR) $(INCLUDE_DIR) $(CUDA_INCLUDE_DIR) $(CAFFE_PB_DIR) $(OPENCV_INCLUDE_DIR) $(EIGEN_INCLUDE_DIR)
+INCLUDE_DIRS := $(CAFFE_INCLUDE_DIR) $(INCLUDE_DIR) $(CUDA_INCLUDE_DIR) $(CAFFE_PB_DIR) $(OPENCV_INCLUDE_DIR) $(EIGEN_INCLUDE_DIR) $(ANACONDA_INCLUDE_DIR)
 LIBRARY_DIRS := $(CAFFE_LIB_DIR) $(LIB_DIR) $(OPENCV_LIB_DIR) $(GLOG_LIB_DIR) $(CUDA_DIR)/lib64
-LIBRARIES := caffe boost_system opencv_core opencv_imgproc opencv_highgui glog cudart cublas curand
+LIBRARIES := caffe boost_system opencv_imgcodecs opencv_core opencv_imgproc opencv_highgui glog cudart cublas curand
 
 WARNINGS := -Wall -Wno-sign-compare -Wno-uninitialized
 COMMON_FLAGS += $(foreach includedir,$(INCLUDE_DIRS),-I$(includedir))
@@ -91,7 +92,7 @@ $(BUILD_DIR)/%.o: %.cpp | $(ALL_BUILD_DIRS)
 $(EXECUTABLE_PROGRAM): %.bin : %.o $(OBJS)
 	@ echo CXX/LD -o $@
 	@ $(CXX)  $(OBJS) -o $@ $(LINKFLAGS) $(LDFLAGS) \
-		-Wl,-rpath,$(ORIGIN)/../../../$(CAFFE_LIB_DIR) -Wl,-rpath,/usr/local/cuda-8.0/lib64
+		-Wl,-rpath,$(ORIGIN)/../../../$(CAFFE_LIB_DIR) -Wl,-rpath,/usr/local/cuda-9.0/lib64
 	@ cd ./bin ; rm -rf demo ; ln -s ../$(EXECUTABLE_PROGRAM) demo
 
 $(BUILD_DIR)/cuda/%.o: %.cu | $(ALL_BUILD_DIRS)
