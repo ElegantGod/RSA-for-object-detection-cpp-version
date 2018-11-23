@@ -305,19 +305,43 @@ void RsaFaceDetector::lrnProcess(std::vector<Face> &faces_out){
 			for(int h = 0; h < 5; ++h){
 				srcFivePoints[h] = pts_out[j][h];
 			}
-			getTripPoints(dst_rect, srcFivePoints);
+//			getTripPoints(dst_rect, srcFivePoints);
 			double scale_double = pow(2, this->scale[i]-5);
-			double rect_width = sqrt(pow((dst_rect[1].x - dst_rect[2].x), 2) 
-					+ pow((dst_rect[1].y - dst_rect[2].y), 2));
-			rects[j][0] = round((dst_rect[0].x - rect_width/2) / scale_double * resize_factor);
-			rects[j][1] = round((dst_rect[0].y - rect_width/2) / scale_double * resize_factor);
-			rects[j][2] = round((dst_rect[0].x + rect_width/2) / scale_double * resize_factor);
-			rects[j][3] = round((dst_rect[0].y + rect_width/2) / scale_double * resize_factor);
-			rects_all.push_back(rects[j]);
-			for(int h = 0; h < 5; h++){
+//			double rect_width = sqrt(pow((dst_rect[1].x - dst_rect[2].x), 2)
+//					+ pow((dst_rect[1].y - dst_rect[2].y), 2));
+//			rects[j][0] = round((dst_rect[0].x - rect_width/2) / scale_double * resize_factor);
+//			rects[j][1] = round((dst_rect[0].y - rect_width/2) / scale_double * resize_factor);
+//			rects[j][2] = round((dst_rect[0].x + rect_width/2) / scale_double * resize_factor);
+//			rects[j][3] = round((dst_rect[0].y + rect_width/2) / scale_double * resize_factor);
+//			rects_all.push_back(rects[j]);
+//			for(int h = 0; h < 5; h++){
+//				pts_out[j][h].x = round(pts_out[j][h].x / scale_double * resize_factor);
+//				pts_out[j][h].y = round(pts_out[j][h].y / scale_double * resize_factor);
+//			}
+			double rect_top = (double)MAX_IMG;
+			double rect_bottom = 0.;
+			double rect_left = (double)MAX_IMG;
+			double rect_right = 0.;
+			for (int h = 0; h < 5; h++)
+			{
 				pts_out[j][h].x = round(pts_out[j][h].x / scale_double * resize_factor);
 				pts_out[j][h].y = round(pts_out[j][h].y / scale_double * resize_factor);
+				if (pts_out[j][h].x > rect_right)
+					rect_right = pts_out[j][h].x;
+				if (pts_out[j][h].x < rect_left)
+					rect_left = pts_out[j][h].x;
+				if (pts_out[j][h].y > rect_bottom)
+					rect_bottom = pts_out[j][h].y;
+				if (pts_out[j][h].y < rect_top)
+					rect_top = pts_out[j][h].y;
 			}
+			double rect_w = rect_right - rect_left;
+			double rect_h = rect_bottom - rect_top;
+			rects[j][0] = std::max(0., rect_left - 0.5 * rect_w);
+			rects[j][1] = std::max(0., rect_top - 0.5 * rect_h);
+			rects[j][2] = std::min((double)MAX_IMG, rect_right + 0.5 * rect_w);
+			rects[j][3] = std::min((double)MAX_IMG, rect_bottom + 0.5 * rect_h);
+			rects_all.push_back(rects[j]);
 			pts_all.push_back(pts_out[j]);
 		}
 	}
